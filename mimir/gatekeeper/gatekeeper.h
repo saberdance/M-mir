@@ -21,11 +21,20 @@ public:
 	void showHelp();
 	GatekeeperResult Run(std::vector<std::string> args);
 private:
-	GatekeeperResult EncryptFile(std::vector<std::string> args);
-	GatekeeperResult RunFolder(std::vector<std::string> args);
+	GatekeeperResult MakeSetupFile(std::vector<std::string> args);
+	GatekeeperResult EncryptFile(std::vector<std::string> args);	
+	GatekeeperResult RunFolder(std::vector<std::string> args);	
 	GatekeeperResult GenRSAKeyPair(std::vector<std::string> args);
-	GatekeeperResult GenUserEncryptKey(std::vector<std::string> args);
+	GatekeeperResult GenUserEncryptKey(std::vector<std::string> args);	
 	GatekeeperResult RSAEncodeFEK(std::vector<std::string> args);
+	std::vector<std::string> LoadTargetConfigFile();
+private:
+	GatekeeperResult Raw_EncryptFile(std::__cxx11::string sourceFile, std::__cxx11::string aeskeyFile, 
+		std::__cxx11::string publickeyFile, std::__cxx11::string privatekeyFile,std::__cxx11::string outputFolder="");
+	GatekeeperResult Raw_RunFolder(std::__cxx11::string targetFolder);
+	GatekeeperResult Raw_GenRSAKeyPair(std::__cxx11::string outDir);
+	GatekeeperResult Raw_GenUserEncryptKey(std::__cxx11::string hdCode, std::__cxx11::string authKey, std::__cxx11::string keyFile);
+private:
 	KeyMaker keyMaker;
 };
 

@@ -238,10 +238,14 @@ bool KeyMaker::aesDecrypt(unsigned char* in, unsigned char* key, unsigned char* 
     for (int i = 0; i < AES_BLOCK_SIZE; ++i)
         iv[i] = 0;
     AES_KEY aes;
+    //logger.debug("AES_set_decrypt_key");
     if (AES_set_decrypt_key(key, 256, &aes) < 0)
     {
         return false;
     }
+    //logger.debug("AES_set_decrypt_key done");
+    //logger.debug("AES_cbc_encrypt");
     AES_cbc_encrypt(in, out, len, &aes, iv, AES_DECRYPT);
+   // logger.debug("AES_cbc_encrypt done");
     return true;
 }

@@ -22,4 +22,5 @@ int main(int argc, char* argv[])
 	}
 	GatekeeperResult ret=gatekeeper.Run(args);
 	logger.log("GateKeeper End",LFOOTER);
+	return ret.code;
 }

@@ -6,7 +6,7 @@
 class EncryptPack
 {
 public:
-	EncryptPack(std::string sourceFile, std::string aesKey, std::string publicKey, std::string privateKey);
+	EncryptPack(std::string sourceFile, std::string aesKey, std::string publicKey, std::string privateKey,std::string outputFolder);
 public:
 	//test if files exists;
 	bool ValidateFiles();
@@ -15,6 +15,7 @@ public:
 	std::string aeskey = "";
 	std::string publickey = "";
 	std::string privatekey = "";
+	std::string outputfolder = "";
 };
 
 class DecryptPack
@@ -39,6 +40,7 @@ public:
 private:
 	bool EncodeSourceFile();
 	bool MakeKeyFiles();
+	bool CopyFilesToTargetFolder();
 private:
 	EncryptPack rawpack;
 	std::string targetfolder;

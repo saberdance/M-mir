@@ -77,6 +77,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <RemoteDeployDir>$(RemoteProjectDir)</RemoteDeployDir>
+    <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely);@(DataFilesToCopyRemotely)</SourcesToCopyRemotelyOverride>
+    <IncludePath>
+    </IncludePath>
+    <LibraryPath>
+    </LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
@@ -85,21 +90,30 @@
   <ItemGroup>
     <ClCompile Include="..\utils\md5.cpp" />
     <ClCompile Include="..\utils\mUtil.cpp" />
+    <ClCompile Include="..\utils\tinyxml2.cpp" />
+    <ClCompile Include="BClientPacker.cpp" />
+    <ClCompile Include="CClientPacker.cpp" />
     <ClCompile Include="FileCryptor.cpp" />
     <ClCompile Include="gatekeeper.cpp" />
     <ClCompile Include="KeyMaker.cpp" />
+    <ClCompile Include="LauncherPacker.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\utils\md5.h" />
     <ClInclude Include="..\utils\mUtil.h" />
+    <ClInclude Include="..\utils\tinyxml2.h" />
+    <ClInclude Include="BClientPacker.h" />
+    <ClInclude Include="CClientPacker.h" />
     <ClInclude Include="FileCryptor.h" />
     <ClInclude Include="gatekeeper.h" />
     <ClInclude Include="KeyMaker.h" />
+    <ClInclude Include="LauncherPacker.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <LibraryDependencies>stdc++fs;ssl;crypto</LibraryDependencies>
+      <AdditionalDependencies>$(StlAdditionalDependencies);%(Link.AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
       <PreprocessorDefinitions>_DEBUG</PreprocessorDefinitions>
@@ -110,7 +124,11 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(SolutionDir)3rdParty/lib/libjsoncpp.a;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

@@ -14,18 +14,27 @@ bool FileCryptor::EncryptFile()
 	logger.log("EncryptFile Start");
 	fs::path sourcePath(rawpack.sourcefile);
 	logger.log("Source File:" + sourcePath.string());
-	fs::path outFolder = fs::path(sourcePath.parent_path().string()+"/"+sourcePath.stem().string());
+	fs::path outFolder = fs::path(rawpack.outputfolder+"/mimirpack");
 	targetfolder = outFolder.string();
-	logger.log("Target Folder:" + targetfolder);
+	std::string outputfolder = targetfolder + "/mimirpack";
 	if (!fs::exists(outFolder))
 	{
 		fs::create_directories(outFolder);
 	}
+	if (!fs::exists(outputfolder))
+	{
+		fs::create_directories(outputfolder);
+	}
+	logger.log("Target Folder:" + targetfolder);
 	bool succ = EncodeSourceFile();
+	logger.log("Encode Source File Done:" + std::to_string(succ));
 	if (succ)
 	{
 		succ = MakeKeyFiles();
+		logger.log("MakeKeyFiles Done:" + std::to_string(succ));
 	}
+	succ = CopyFilesToTargetFolder();
+	logger.log("CopyFilesToTargetFolder Done:" + std::to_string(succ));
 	return succ;
 
 }
@@ -47,13 +56,17 @@ bool FileCryptor::EncodeSourceFile()
 	file.seekg(0, std::ios::beg);
 	file_length += 1;
 	logger.debug("Source File Length:" + std::to_string(file_length));
-	byte data[file_length];
+	byte* data=new byte[file_length];
+	logger.debug("memset");
 	memset(data, 0, file_length);
 	int outLength = file_length;
-	byte out[outLength];
+	byte* out=new byte[outLength];
+	logger.debug("memset");
 	memset(out, 0, outLength);
+	logger.debug("file.read");
 	file.read((char*)data, file_length);
 	file.close();
+	logger.debug("file.close()");
 	logger.debug("Source File Data Loaded:" + std::to_string(file_length));
 	KeyMaker keymaker;
 	bool succ=keymaker.aesEncrypt(data, (unsigned char*)(key.c_str()), out, file_length);
@@ -62,25 +75,29 @@ bool FileCryptor::EncodeSourceFile()
 		logger.error("AesEncrypt failed");
 		return false;
 	}
-	std::ofstream fullResult;
-	fullResult.open(targetfolder + "/elf_all", std::ios::binary);
-	fullResult.write((const char*)out, outLength);
-	fullResult.flush();
-	fullResult.close();
+	//std::ofstream fullResult;
+	//fullResult.open(targetfolder + "/elf_all", std::ios::binary);
+	//fullResult.write((const char*)out, outLength);
+	//fullResult.flush();
+	//fullResult.close();
 	int splitLength = outLength / FILE_PART_NUM;
 	logger.debug("splitLength:" + std::to_string(splitLength));
+	std::string outputfolder = targetfolder + "/mimirpack";
 	for (size_t i = 0; i < FILE_PART_NUM; i++)
 	{
-		byte splitData[splitLength];
+		byte* splitData=new byte[splitLength];
 		memset(splitData, 0, splitLength);
 		memcpy(splitData, out + i * splitLength, splitLength);
 		std::ofstream outFile;
-		outFile.open(targetfolder + "/elf_" + std::to_string(i),std::ios::binary);
+		outFile.open(outputfolder + "/elf_" + std::to_string(i),std::ios::binary);
 		outFile.write((const char*)splitData, splitLength);
 		outFile.flush();
 		outFile.close();
-		logger.debug(targetfolder + "/elf_" + std::to_string(i) + " generated");
+		logger.debug(outputfolder + "/elf_" + std::to_string(i) + " generated");
+		delete splitData;
 	}
+	delete data;
+	delete out;
 	return true;
 }
 
@@ -91,21 +108,40 @@ bool FileCryptor::MakeKeyFiles()
 	std::string key = { 0 };
 	keyFile >> key;
 	keyFile.close();
-	fs::copy_file(rawpack.privatekey, targetfolder + "/elf_16");
+	fs::copy_file(rawpack.privatekey, targetfolder + "/mimirpack/elf_16",fs::copy_options::overwrite_existing);
 	std::ofstream elf0;
-	elf0.open(targetfolder + "/elf_0", std::ios::binary | std::ios::app);
+	elf0.open(targetfolder + "/mimirpack/elf_0", std::ios::binary | std::ios::app);
 	elf0.write(key.c_str(), key.length());
 	elf0.flush();
 	elf0.close();
 	return true;
 }
 
-EncryptPack::EncryptPack(std::string sourceFile, std::string aesKey, std::string publicKey, std::string privateKey)
+bool FileCryptor::CopyFilesToTargetFolder()
+{
+	fs::path RawFolder(fs::path(rawpack.sourcefile).parent_path());
+	fs::path TargetFolder(targetfolder);
+	for(auto &diter : fs::directory_iterator(RawFolder))
+	{
+		auto filePath = diter.path();
+		if (filePath==TargetFolder.parent_path()||filePath==fs::path(rawpack.sourcefile)||filePath.filename()=="Dockerfile"||filePath.filename()=="mimir")
+		{
+			logger.debug("Skip:" + filePath.string());
+			continue;
+		}
+		fs::copy(filePath, fs::path(TargetFolder.string() + "/" + filePath.filename().string()),fs::copy_options::overwrite_existing);
+		logger.debug("Copy:" + filePath.string());
+	}
+	return true;
+}
+
+EncryptPack::EncryptPack(std::string sourceFile, std::string aesKey, std::string publicKey, std::string privateKey, std::string outputFolder)
 {
 	sourcefile = sourceFile;
 	aeskey = aesKey;
 	publickey = publicKey;
 	privatekey = privateKey;
+	outputfolder = outputFolder;
 }
 
 bool EncryptPack::ValidateFiles()
@@ -160,11 +196,12 @@ byte* FileDecryptor::DecryptFile()
 	firstfile.read((char*)firstData, file_length);
 	firstfile.read((char*)keyData, 32);
 	std::string key((char*)keyData);
-	logger.debug("Key:" + key);
+	//logger.debug("Key:" + key);
 	firstfile.close();
 	memcpy(finalData, firstData, file_length);
 	for (size_t i = 1; i < FILE_PART_NUM; i++)
 	{
+		//logger.debug("Link Elf:" + std::to_string(i));
 		std::ifstream onefile;
 		onefile.open(rawpack.sourcefolder + "/elf_"+std::to_string(i), std::ios::binary);
 		byte oneData[file_length];
@@ -173,23 +210,32 @@ byte* FileDecryptor::DecryptFile()
 		onefile.close();
 		memcpy(finalData + i * file_length, oneData, file_length);
 	}
-	logger.log("Gen Encrypted Elf Done");
-	byte restored[file_length* FILE_PART_NUM];
+	logger.log("Gen Decrypted Elf Done");
+	//std::ofstream finalDataFile;
+	//finalDataFile.open("./final_all", std::ios::binary);
+	//finalDataFile.write((const char*)finalData, file_length * FILE_PART_NUM);
+	//finalDataFile.flush();
+	//finalDataFile.close();
+	byte* restored=new byte[file_length* FILE_PART_NUM];
 	memset(restored, 0, file_length* FILE_PART_NUM);
 	//decrypt data
 	KeyMaker keymaker;
 	bool succ = keymaker.aesDecrypt(finalData, (unsigned char*)(key.c_str()), restored, file_length* FILE_PART_NUM);
-	//std::ofstream restoredResult;
-	//restoredResult.open("./decrypteddata", std::ios::binary);
-	//restoredResult.write((const char*)restored, file_length* FILE_PART_NUM);
-	//restoredResult.flush();
-	//restoredResult.close();
+	logger.log("aesDecrypt Elf Done");
 	byte* ret = new byte[file_length * FILE_PART_NUM];
 	memset(ret, 0, file_length * FILE_PART_NUM);
 	memcpy(ret, restored, file_length * FILE_PART_NUM);
+
+	//std::ofstream fullResult;
+	//fullResult.open("./elf_all", std::ios::binary);
+	//fullResult.write((const char*)ret, file_length * FILE_PART_NUM);
+	//fullResult.flush();
+	//fullResult.close();
+
 	delete finalData;
 	delete firstData;
 	delete keyData;
+	delete restored;
 	return ret;
 }
 

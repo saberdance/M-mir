@@ -29,6 +29,7 @@ public:
 	MLogger(std::string logfile);
 public:
 	void log(std::string msg, LOGTYPE ltype=LOGTYPE::LNORMAL);
+	void output(std::string status, float progress, std::string lasterror="none");
 	void error(std::string msg, LOGTYPE ltype = LOGTYPE::LNORMAL);
 	void debug(std::string msg, LOGTYPE ltype = LOGTYPE::LNORMAL);
 	void crash(std::string msg,std::string module="");
@@ -36,6 +37,7 @@ public:
 	void setLogLevel(MLOGLV level);
 private:
 	void writeLog(std::string msg);
+	void writePureLog(std::string msg);
 	std::string genHeaderStr(std::string msg);
 	void crash2Console(std::string msg, std::string module = "");
 	void crash2Console(std::vector<std::string>msgs, std::string module = "");
@@ -58,6 +60,7 @@ public:
 	static std::string trimRight(std::string str);
 	static std::string md5String(std::string str);
 	static std::string md5File(std::string filePath);
+	static std::vector<std::string> getFileLines(std::string filePath);
 };
 
 static MLogger logger;

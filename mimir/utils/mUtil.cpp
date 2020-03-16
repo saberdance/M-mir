@@ -57,6 +57,13 @@ void MLogger::log(std::string msg, LOGTYPE ltype)
     writeLog("[LOG]" + msg);
 }
 
+//[output]{"status":"error","progress"=100,"lasterror"="none"}[output]
+
+void MLogger::output(std::string status,float progress,std::string lasterror)
+{
+    writePureLog("[OUTPUT]{\"Status\":\""+status+"\",\"Progress\":"+std::to_string(progress)+",\"ERROR\":\""+lasterror+"\"}[OUTPUT]");
+}
+
 void MLogger::error(std::string msg,LOGTYPE ltype)
 {
     if (ltype == LHEADER || ltype == LFOOTER)
@@ -127,6 +134,33 @@ void MLogger::writeLog(std::string msg)
         }
     }
 }
+
+void MLogger::writePureLog(std::string msg)
+{
+    try
+    {
+        MLOCK(logMtx);
+        if (logLevel == MLOGLV::DEBUG_WITH_CONSOLE || logLevel == MLOGLV::RELEASE_WITH_CONSOLE)
+        {
+            std::cout << msg << std::endl;
+        }
+        std::ofstream fileStream;
+        fileStream.open(logFilePath, std::ios::app);
+        fileStream << msg << std::endl;
+        fileStream.flush();
+        fileStream.close();
+    }
+    catch (std::logic_error & e)
+    {
+        if (logLevel == MLOGLV::DEBUG_WITH_CONSOLE || logLevel == MLOGLV::RELEASE_WITH_CONSOLE)
+        {
+            std::vector<std::string> crashLog;
+            crashLog.push_back("Cur Msg:" + msg);
+            crash2Console(e.what(), "LOGGER");
+        }
+    }
+}
+
 
 std::string MLogger::genHeaderStr(std::string msg)
 {
@@ -228,6 +262,23 @@ std::string MUtil::md5File(std::string fileName) {
     MD5 m(f);
     f.close();
     return m.toString();
+}
+
+std::vector<std::string> MUtil::getFileLines(std::string filePath)
+{
+    if (!fs::exists(filePath))
+    {
+        return std::vector<std::string>();
+    }
+    std::vector<std::string> targets;
+    std::ifstream ifs;
+    ifs.open(filePath);
+    std::string line;
+    while (getline(ifs, line)) {
+        targets.push_back(line);
+    }
+    ifs.close();
+    return targets;
 }
 
 std::string MUtil::md5String(std::string input) {
