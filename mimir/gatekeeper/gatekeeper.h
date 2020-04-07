@@ -29,11 +29,11 @@ private:
 	GatekeeperResult RSAEncodeFEK(std::vector<std::string> args);
 	std::vector<std::string> LoadTargetConfigFile();
 private:
-	GatekeeperResult Raw_EncryptFile(std::__cxx11::string sourceFile, std::__cxx11::string aeskeyFile, 
-		std::__cxx11::string publickeyFile, std::__cxx11::string privatekeyFile,std::__cxx11::string outputFolder="");
-	GatekeeperResult Raw_RunFolder(std::__cxx11::string targetFolder);
-	GatekeeperResult Raw_GenRSAKeyPair(std::__cxx11::string outDir);
-	GatekeeperResult Raw_GenUserEncryptKey(std::__cxx11::string hdCode, std::__cxx11::string authKey, std::__cxx11::string keyFile);
+	GatekeeperResult Raw_EncryptFile(std::string sourceFile, std::string aeskeyFile, 
+		std::string publickeyFile, std::string privatekeyFile,std::string outputFolder="");
+	GatekeeperResult Raw_RunFolder(std::string targetFolder);
+	GatekeeperResult Raw_GenRSAKeyPair(std::string outDir);
+	GatekeeperResult Raw_GenUserEncryptKey(std::string hdCode, std::string authKey, std::string keyFile);
 private:
 	KeyMaker keyMaker;
 };

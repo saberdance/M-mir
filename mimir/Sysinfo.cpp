@@ -66,20 +66,25 @@ bool Sysinfo::LoadNetcardInfo()
 {
     try
     {
-        std::fstream File;
-        File.open("/sys/class/net/eth0/address",std::ios::in);
+        //std::fstream File;
+        //File.open("/sys/class/net/eth0/address",std::ios::in);
         std::vector<std::string> vecErrorCode;
         //logger.debug("LoadNetcardInfo", LHEADER);
-        while (!File.eof())
-        {
-            std::string strErrCode = "";
-            std::getline(File, strErrCode);
-            //logger.debug("NetCardInfo:" + strErrCode);
-            vecErrorCode.push_back(strErrCode);
-        }
-        File.close();
+        //while (!File.eof())
+        //{
+        //    std::string strErrCode = "";
+        //    std::getline(File, strErrCode);
+        //    //logger.debug("NetCardInfo:" + strErrCode);
+        //    vecErrorCode.push_back(strErrCode);
+        //}
+        //File.close();
         //logger.debug("", LFOOTER);
-        netcard=new NetCard(vecErrorCode[0]);
+        char* cmd = "lshw -c network | grep serial | head -n 1";
+        char output[256] = { 0 };
+        MUtil::get_system_output(cmd, output, 256);
+        std::string netcardInfo = std::string(output);
+        //logger.log("Netcard Info:" + netcardInfo);
+        netcard=new NetCard(std::string(output));
         return true;
     }
     catch (const std::exception& e)

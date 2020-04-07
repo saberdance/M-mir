@@ -97,10 +97,10 @@ GatekeeperResult Gatekeeper::MakeSetupFile(std::vector<std::string> args)
 	logger.output("working", 15);
 	GatekeeperResult genFileKeyRet = Raw_GenUserEncryptKey(sig, key, keyFolder + "/fileEncrypt.key");
 	logger.output("working", 20);
-	std::string sourceFolder = "/home/ubuntu/cotdocker";
+	std::string sourceFolder = "/root/cotdocker/images";
 	fs::copy(keyFolder, fs::path(sourceFolder + "/mimir/keys"), fs::copy_options::overwrite_existing);
 	logger.output("working", 25);
-	std::string cmd = std::string("cd /home/ubuntu/cotdocker/images && ./makelocal.sh ") + outputFolder + " " + key+" "+ serverAddr;
+	std::string cmd = std::string("cd /root/cotdocker/images && ./makelocal.sh ") + outputFolder + " " + key+" "+ serverAddr;
 	logger.log("Command:" + cmd);
 	int ret=system(cmd.c_str());
 	logger.log("Command Ret:" + ret);
@@ -142,8 +142,8 @@ GatekeeperResult Gatekeeper::EncryptFile(std::vector<std::string> args)
 	return Raw_EncryptFile(sourceFile, aeskeyFile, publickeyFile, privatekeyFile,outputFolder);
 }
 
-GatekeeperResult Gatekeeper::Raw_EncryptFile(std::__cxx11::string sourceFile, std::__cxx11::string aeskeyFile,
-	std::__cxx11::string publickeyFile, std::__cxx11::string privatekeyFile,std::__cxx11::string outputFolder)
+GatekeeperResult Gatekeeper::Raw_EncryptFile(std::string sourceFile, std::string aeskeyFile,
+	std::string publickeyFile, std::string privatekeyFile,std::string outputFolder)
 {
 	EncryptPack pack(sourceFile, aeskeyFile, publickeyFile, privatekeyFile,outputFolder);
 	if (!pack.ValidateFiles())
@@ -175,7 +175,7 @@ GatekeeperResult Gatekeeper::RunFolder(std::vector<std::string> args)
 	return Raw_RunFolder(targetFolder);
 }
 
-GatekeeperResult Gatekeeper::Raw_RunFolder(std::__cxx11::string targetFolder)
+GatekeeperResult Gatekeeper::Raw_RunFolder(std::string targetFolder)
 {
 	DecryptPack pack(targetFolder);
 	if (!pack.ValidateFiles())
@@ -226,7 +226,7 @@ GatekeeperResult Gatekeeper::GenRSAKeyPair(std::vector<std::string> args)
 	
 }
 
-GatekeeperResult Gatekeeper::Raw_GenRSAKeyPair(std::__cxx11::string outDir)
+GatekeeperResult Gatekeeper::Raw_GenRSAKeyPair(std::string outDir)
 {
 	if (keyMaker.GenRSAKeyPair(outDir))
 	{
@@ -255,7 +255,7 @@ GatekeeperResult Gatekeeper::GenUserEncryptKey(std::vector<std::string> args)
 	return Raw_GenUserEncryptKey(hdCode, authKey, keyFile);
 }
 
-GatekeeperResult Gatekeeper::Raw_GenUserEncryptKey(std::__cxx11::string hdCode, std::__cxx11::string authKey, std::__cxx11::string keyFile)
+GatekeeperResult Gatekeeper::Raw_GenUserEncryptKey(std::string hdCode, std::string authKey, std::string keyFile)
 {
 	std::string aesKey = keyMaker.GenUserAESKey(hdCode, authKey);
 	fs::path filePath(keyFile);

@@ -285,3 +285,20 @@ std::string MUtil::md5String(std::string input) {
     MD5 m(input);
     return m.toString();
 }
+
+int MUtil::get_system_output(char* cmd, char* output, int size)
+{
+    FILE* fp = NULL;
+    fp = popen(cmd, "r");
+    if (fp)
+    {
+        if (fgets(output, size, fp) != NULL)
+        {
+            if (output[strlen(output) - 1] == '\n')
+                output[strlen(output) - 1] = '\0';
+        }
+        pclose(fp);
+    }
+    return 0;
+}
+

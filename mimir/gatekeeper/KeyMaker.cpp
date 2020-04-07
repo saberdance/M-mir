@@ -114,21 +114,21 @@ bool KeyMaker::GenRSAKeyPair(std::string outDir)
     auto publicKeyFile = outDir + "/publickey.pem";
     auto privateKeyFile = outDir + "/privatekey.pem";
     logger.log("GenRawKey", LHEADER);
-    auto cmd = "sudo openssl genrsa -out " + rawFile + " 2048";
+    auto cmd = "openssl genrsa -out " + rawFile + " 2048";
     system(cmd.c_str());
     if (!fs::exists(rawFile))
     {
         return false;
     }
     logger.log("GenPrivateKey", LHEADER);
-    cmd = "sudo openssl pkcs8 -topk8 -inform PEM -outform PEM -in " + rawFile + " -out " + privateKeyFile + " -nocrypt";
+    cmd = "openssl pkcs8 -topk8 -inform PEM -outform PEM -in " + rawFile + " -out " + privateKeyFile + " -nocrypt";
     system(cmd.c_str());
     if (!fs::exists(privateKeyFile))
     {
         return false;
     }
     logger.log("GenPublicKey", LHEADER);
-    cmd = "sudo openssl rsa -in " + rawFile + " -pubout -outform PEM -out " + publicKeyFile;
+    cmd = "openssl rsa -in " + rawFile + " -pubout -outform PEM -out " + publicKeyFile;
     system(cmd.c_str());
     if (!fs::exists(publicKeyFile))
     {

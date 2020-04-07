@@ -1,0 +1,4 @@
+*.user
+/mimir/gatekeeper/obj
+/mimir/gatekeeper/bin
+/mimir/gatekeeper/gatekeeper.vcxproj.user

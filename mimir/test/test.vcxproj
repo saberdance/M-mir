@@ -35,9 +35,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{ad070afa-8b5e-45dd-85fb-620bbcab2412}</ProjectGuid>
+    <ProjectGuid>{e7f7520a-b0b6-4d75-9374-085d2d25d641}</ProjectGuid>
     <Keyword>Linux</Keyword>
-    <RootNamespace>mimir</RootNamespace>
+    <RootNamespace>test</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <ApplicationType>Linux</ApplicationType>
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
@@ -74,42 +74,21 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <RemoteDeployDir>$(RemoteProjectDir)</RemoteDeployDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <RemoteDeployDir>$(RemoteProjectDir)</RemoteDeployDir>
-  </PropertyGroup>
   <ItemGroup>
+    <ClCompile Include="..\utils\md5.cpp" />
+    <ClCompile Include="..\utils\mUtil.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Sysinfo.cpp" />
-    <ClCompile Include="utils\md5.cpp" />
-    <ClCompile Include="utils\mUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sysinfo.h" />
-    <ClInclude Include="utils\md5.h" />
-    <ClInclude Include="utils\mUtil.h" />
+    <ClInclude Include="..\utils\md5.h" />
+    <ClInclude Include="..\utils\mUtil.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
-  </ItemGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <PreprocessorDefinitions>_DEBUG</PreprocessorDefinitions>
-      <CppLanguageStandard>c++17</CppLanguageStandard>
-    </ClCompile>
-    <Link>
-      <LibraryDependencies>stdc++fs</LibraryDependencies>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_RELEASE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++17</CppLanguageStandard>
     </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <LibraryDependencies>stdc++fs</LibraryDependencies>
     </Link>

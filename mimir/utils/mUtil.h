@@ -46,7 +46,7 @@ private:
 #ifdef _DEBUG
 	int logLevel = MLOGLV::DEBUG_WITH_CONSOLE;
 #else
-	int logLevel = MLOGLV::RELEASE;
+	int logLevel = MLOGLV::DEBUG_WITH_CONSOLE;
 #endif
 };
 
@@ -61,6 +61,7 @@ public:
 	static std::string md5String(std::string str);
 	static std::string md5File(std::string filePath);
 	static std::vector<std::string> getFileLines(std::string filePath);
+	static int get_system_output(char* cmd, char* output, int size);
 };
 
 static MLogger logger;
